@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ydzhang.security.mapper.SysPermissionMapper">
+  <resultMap id="SysPermissionMap" type="com.ydzhang.security.entity.SysPermission">
+    <!--@mbg.generated-->
+    <!--@Table sys_permission-->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="permission_code" jdbcType="VARCHAR" property="permissionCode" />
+    <result column="permission_name" jdbcType="VARCHAR" property="permissionName" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, permission_code, permission_name
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="SysPermissionMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from sys_permission
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from sys_permission
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ydzhang.security.entity.SysPermission" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into sys_permission (permission_code, permission_name)
+    values (#{permissionCode,jdbcType=VARCHAR}, #{permissionName,jdbcType=VARCHAR})
+  </insert>
+
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ydzhang.security.entity.SysPermission" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into sys_permission
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="permissionCode != null">
+        permission_code,
+      </if>
+      <if test="permissionName != null">
+        permission_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="permissionCode != null">
+        #{permissionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionName != null">
+        #{permissionName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.ydzhang.security.entity.SysPermission">
+    <!--@mbg.generated-->
+    update sys_permission
+    <set>
+      <if test="permissionCode != null">
+        permission_code = #{permissionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="permissionName != null">
+        permission_name = #{permissionName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.ydzhang.security.entity.SysPermission">
+    <!--@mbg.generated-->
+    update sys_permission
+    set permission_code = #{permissionCode,jdbcType=VARCHAR},
+      permission_name = #{permissionName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectListByUser" resultMap="SysPermissionMap">
+    SELECT
+    p.*
+    FROM
+    sys_user AS u
+    LEFT JOIN sys_user_role_relation AS ur
+    ON u.id = ur.user_id
+    LEFT JOIN sys_role AS r
+    ON r.id = ur.role_id
+    LEFT JOIN sys_role_permission_relation AS rp
+    ON r.id = rp.role_id
+    LEFT JOIN sys_permission AS p
+    ON p.id = rp.permission_id
+    WHERE u.id = #{userId}
+  </select>
+
+  <select id="selectListByPath" resultMap="SysPermissionMap">
+    SELECT
+    pe.*
+    FROM
+    sys_permission pe
+    LEFT JOIN sys_request_path_permission_relation re ON re.permission_id = pe.id
+    LEFT JOIN sys_request_path pa ON pa.id = re.url_id
+    WHERE pa.url = #{path}
+  </select>
+</mapper>
